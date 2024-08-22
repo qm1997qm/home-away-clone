@@ -34,7 +34,7 @@ async function PropertyDetailsPage({ params }: { params: { id: string } }) {
         <section>
             <BreadCrumbs name={property.name} />
             <header className='flex justify-between items-center mt-4'>
-                <h1 className='text-4xl font-bold '>{property.tagline}</h1>
+                <h1 className='text-3xl font-bold '>{property.tagline}</h1>
                 <div className='flex items-center gap-x-4'>
                     {/* share button */}
                     <ShareButton
