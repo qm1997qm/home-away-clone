@@ -206,7 +206,7 @@ export const fetchFavoriteId = async ({
     propertyId: string;
 }) => {
     const user = await getAuthUser();
-    const favorites = await db.favorite.findFirst({
+    const favorite = await db.favorite.findFirst({
         where: {
             propertyId,
             profileId: user.id,
@@ -216,7 +216,7 @@ export const fetchFavoriteId = async ({
         },
     });
 
-    return favorites?.id || null;
+    return favorite?.id || null;
 };
 
 export const toggleFavoriteAction = async (prevState: {
@@ -230,7 +230,7 @@ export const toggleFavoriteAction = async (prevState: {
         if (favoriteId) {
             await db.favorite.delete({
                 where: {
-                    id: propertyId,
+                    id: favoriteId,
                 },
             });
         } else {
@@ -285,4 +285,18 @@ export const fetchPropertyDetails = async (id: string) => {
         },
     });
     return property;
+};
+
+// Review
+export const createReviewAction = async () => {
+    return { message: "create review" };
+};
+export const fetchPropertyReviews = async () => {
+    return { message: "create review" };
+};
+export const fetchPropertyReviewByUser = async () => {
+    return { message: "create review" };
+};
+export const deleteReviewAction = async () => {
+    return { message: "create review" };
 };
