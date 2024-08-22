@@ -197,3 +197,55 @@ export const fetchProperties = async ({
     });
     return properties;
 };
+
+// ### fetchFavorite
+
+export const fetchFavoriteId = async ({
+    propertyId,
+}: {
+    propertyId: string;
+}) => {
+    const user = await getAuthUser();
+    const favorites = await db.favorite.findFirst({
+        where: {
+            propertyId,
+            profileId: user.id,
+        },
+        select: {
+            id: true,
+        },
+    });
+
+    return favorites?.id || null;
+};
+
+export const toggleFavoriteAction = async (prevState: {
+    propertyId: string;
+    favoriteId: string | null;
+    pathname: string;
+}) => {
+    const { propertyId, favoriteId, pathname } = prevState;
+    try {
+        const user = await getAuthUser();
+        if (favoriteId) {
+            await db.favorite.delete({
+                where: {
+                    id: propertyId,
+                },
+            });
+        } else {
+            await db.favorite.create({
+                data: {
+                    propertyId,
+                    profileId: user.id,
+                },
+            });
+        }
+        revalidatePath(pathname);
+        return {
+            message: favoriteId ? "remove from faves" : "added from faves",
+        };
+    } catch (error) {
+        return renderError(error);
+    }
+};

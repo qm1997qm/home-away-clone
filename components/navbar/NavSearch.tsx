@@ -8,7 +8,6 @@ function NavSearch() {
     const searchParams = useSearchParams();
 
     const pathname = usePathname();
-    console.log(pathname);
     const { replace } = useRouter();
     const [search, setSearch] = useState(
         searchParams.get("search")?.toString() || ""
