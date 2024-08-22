@@ -49,6 +49,6 @@ model Favorite {
   updatedAt  DateTime @updatedAt
   profile    Profile  @relation(fields: [profileId], references: [clerkId], onDelete: Cascade)
   profileId  String
-  properties Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId String
 }
