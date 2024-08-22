@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import FormContainer from "../form/FormContainer";
-import { toggleFavoriteAction } from "@/utils/actions";
+import { addFavoriteAction, removeFavoriteAction } from "@/utils/actions";
 import { CardSubmitButton } from "../form/Buttons";
 
 type FavoriteToggleFormProps = {
@@ -15,13 +15,19 @@ function FavoriteToggleForm({
     favoriteId,
 }: FavoriteToggleFormProps) {
     const pathname = usePathname();
-    const toggleAction = toggleFavoriteAction.bind(null, {
+    const addAction = addFavoriteAction.bind(null, {
+        propertyId,
+        favoriteId,
+        pathname,
+    });
+
+    const removeAction = removeFavoriteAction.bind(null, {
         propertyId,
         favoriteId,
         pathname,
     });
     return (
-        <FormContainer action={toggleAction}>
+        <FormContainer action={favoriteId ? removeAction : addAction}>
             <CardSubmitButton isFavorite={favoriteId ? true : false} />
         </FormContainer>
     );
