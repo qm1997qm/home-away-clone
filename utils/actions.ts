@@ -1,7 +1,12 @@
 "use server";
 
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
-import { imageSchema, profileSchema, validatedWithZodSchema } from "./schemas";
+import {
+    imageSchema,
+    profileSchema,
+    propertySchema,
+    validatedWithZodSchema,
+} from "./schemas";
 import { redirect } from "next/navigation";
 import db from "./db";
 import { revalidatePath } from "next/cache";
@@ -133,4 +138,62 @@ export const updateProfileImageAction = async (
     }
     revalidatePath("/profile");
     return { message: "Profile image updated successfully" };
+};
+
+// ### createPropertyAction
+export const createPropertyAction = async (
+    prevState: any,
+    formData: FormData
+): Promise<{ message: string }> => {
+    try {
+        const user = await getAuthUser();
+
+        const rawData = Object.fromEntries(formData);
+        const file = formData.get("image") as File;
+
+        const validatedFields = validatedWithZodSchema(propertySchema, rawData);
+        const validatedFile = validatedWithZodSchema(imageSchema, {
+            image: file,
+        });
+        const fullPath = await uploadImage(validatedFile.image);
+
+        await db.property.create({
+            data: {
+                ...validatedFields,
+                image: fullPath,
+                profileId: user.id,
+            },
+        });
+    } catch (error) {
+        return renderError(error);
+    }
+    redirect("/");
+};
+
+// ### fetchProperties
+export const fetchProperties = async ({
+    search = "",
+    category,
+}: {
+    category?: string;
+    search?: string;
+}) => {
+    const properties = await db.property.findMany({
+        where: {
+            category,
+            OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { tagline: { contains: search, mode: "insensitive" } },
+            ],
+        },
+        select: {
+            id: true,
+            name: true,
+            tagline: true,
+            country: true,
+            image: true,
+            price: true,
+        },
+    });
+    return properties;
 };
