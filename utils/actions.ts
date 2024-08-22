@@ -233,10 +233,10 @@ export const toggleFavoriteAction = async (prevState: {
                     id: favoriteId,
                 },
             });
-        } else {
+        } else if (!favoriteId) {
             await db.favorite.create({
                 data: {
-                    propertyId,
+                    propertyId: propertyId,
                     profileId: user.id,
                 },
             });
