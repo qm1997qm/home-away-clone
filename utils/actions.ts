@@ -219,52 +219,35 @@ export const fetchFavoriteId = async ({
     return favorite?.id || null;
 };
 
-export const addFavoriteAction = async (prevState: {
+export const toggleFavoriteAction = async (prevState: {
+    pathname: string;
     propertyId: string;
     favoriteId: string | null;
-    pathname: string;
 }) => {
-    const { propertyId, favoriteId, pathname } = prevState;
-    try {
-        const user = await getAuthUser();
-        if (!favoriteId) {
-            await db.favorite.create({
-                data: {
-                    propertyId: propertyId,
-                    profileId: user.id,
-                },
-            });
-        }
-        revalidatePath(pathname);
-        return {
-            message: "added from faves",
-        };
-    } catch (error) {
-        return renderError(error);
-    }
-};
-
-export const removeFavoriteAction = async (prevState: {
-    propertyId: string;
-    favoriteId: string | null;
-    pathname: string;
-}) => {
-    const { propertyId, favoriteId, pathname } = prevState;
+    const { pathname, favoriteId, propertyId } = prevState;
     try {
         const user = await getAuthUser();
         if (favoriteId) {
             await db.favorite.delete({
                 where: {
                     id: favoriteId,
+                    profileId: user.id,
+                },
+            });
+        } else {
+            await db.favorite.create({
+                data: {
+                    propertyId,
+                    profileId: user.id,
                 },
             });
         }
         revalidatePath(pathname);
         return {
-            message: "remove from faves",
+            message: favoriteId ? "Removed from Faves" : "Added from Faves",
         };
     } catch (error) {
-        return renderError(error);
+        renderError(error);
     }
 };
 
