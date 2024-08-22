@@ -220,13 +220,13 @@ export const fetchFavoriteId = async ({
 };
 
 export const toggleFavoriteAction = async (prevState: {
-    pathname: string;
     propertyId: string;
     favoriteId: string | null;
+    pathname: string;
 }) => {
+    const user = await getAuthUser();
     const { pathname, favoriteId, propertyId } = prevState;
     try {
-        const user = await getAuthUser();
         if (favoriteId) {
             await db.favorite.delete({
                 where: {
@@ -246,7 +246,7 @@ export const toggleFavoriteAction = async (prevState: {
             message: favoriteId ? "Removed from Faves" : "Added from Faves",
         };
     } catch (error) {
-        renderError(error);
+        return renderError(error);
     }
 };
 
