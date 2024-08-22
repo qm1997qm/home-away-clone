@@ -8,11 +8,14 @@ import PropertyDetails from "@/components/properties/PropertyDetail";
 import ShareButton from "@/components/properties/ShareButton";
 import UserInfo from "@/components/properties/UserInfo";
 import { Separator } from "@/components/ui/separator";
-import { fetchPropertyDetails } from "@/utils/actions";
+import { fetchPropertyDetails, findExistingReview } from "@/utils/actions";
 import { redirect } from "next/navigation";
 import Amenities from "@/components/properties/Amenities";
 import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
+import SubmitReview from "@/components/reviews/SubmitReview";
+import PropertyReviews from "@/components/reviews/PropertyReviews";
+import { auth } from "@clerk/nextjs/server";
 
 async function PropertyDetailsPage({ params }: { params: { id: string } }) {
     const property = await fetchPropertyDetails(params.id);
@@ -21,6 +24,13 @@ async function PropertyDetailsPage({ params }: { params: { id: string } }) {
     const details = { baths, bedrooms, beds, guests };
     const firstName = property.profile.firstName;
     const profileImage = property.profile.profileImage;
+
+    const { userId } = auth();
+    const isNotOwner = property.profile.clerkId !== userId;
+    const reviewDoesNotExist =
+        userId &&
+        isNotOwner &&
+        !(await findExistingReview(userId, property.id));
 
     const DynamicMap = dynamic(
         () => import("@/components/properties/PropertyMap"),
@@ -63,6 +73,8 @@ async function PropertyDetailsPage({ params }: { params: { id: string } }) {
                 </div>
             </section>
             <DynamicMap countryCode={property.country} />
+            {reviewDoesNotExist && <SubmitReview propertyId={property.id} />}
+            <PropertyReviews propertyId={property.id} />
         </section>
     );
 }
